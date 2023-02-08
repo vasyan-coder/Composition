@@ -17,12 +17,12 @@ import com.vasyancoder.composition.domain.entity.Level
 class GameFragment : Fragment() {
 
     private lateinit var level: Level
+    private val viewModelFactory by lazy {
+        GameViewModelFactory(level, requireActivity().application)
+    }
 
     private val viewModel by lazy {
-        ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        )[GameViewModel::class.java]
+        ViewModelProvider(this, viewModelFactory)[GameViewModel::class.java]
     }
 
     private val tvOptions by lazy {
@@ -56,7 +56,6 @@ class GameFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.startGame(level)
         observeViewModel()
         setClickListenersToOptions()
     }

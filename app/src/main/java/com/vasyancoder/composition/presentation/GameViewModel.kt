@@ -2,9 +2,9 @@ package com.vasyancoder.composition.presentation
 
 import android.app.Application
 import android.os.CountDownTimer
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.vasyancoder.composition.R
 import com.vasyancoder.composition.data.GameRepositoryImpl
 import com.vasyancoder.composition.domain.entity.GameResult
@@ -14,12 +14,12 @@ import com.vasyancoder.composition.domain.entity.Question
 import com.vasyancoder.composition.domain.usecases.GenerateQuestionUseCase
 import com.vasyancoder.composition.domain.usecases.GetGameSettingsUseCase
 
-class GameViewModel(application: Application) : AndroidViewModel(application) {
+class GameViewModel(
+    private val context: Application,
+    private val level: Level
+) : ViewModel() {
 
     private lateinit var gameSettings: GameSettings
-    private lateinit var level: Level
-
-    private val context = application
     private val repository = GameRepositoryImpl
 
     private val generateQuestionUseCase = GenerateQuestionUseCase(repository)
@@ -62,8 +62,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private var countOfRightAnswers = 0
     private var countOfQuestions = 0
 
-    fun startGame(level: Level) {
-        getGameSettings(level)
+    init {
+        startGame()
+    }
+
+    private fun startGame() {
+        getGameSettings()
         startTimer()
         generateQuestion()
         updateProgress()
@@ -106,8 +110,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         _question.value = generateQuestionUseCase(gameSettings.maxSumValue)
     }
 
-    private fun getGameSettings(level: Level) {
-        this.level = level
+    private fun getGameSettings() {
         this.gameSettings = getGameSettingsUseCase(level)
         _minPercent.value = gameSettings.minPercentOfRightAnswers
     }

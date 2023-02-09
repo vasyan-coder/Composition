@@ -1,40 +1,45 @@
 package com.vasyancoder.composition.presentation
 
+import android.content.Context
+import android.content.res.ColorStateList
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.vasyancoder.composition.R
 import com.vasyancoder.composition.domain.entity.GameResult
 
+interface OnOptionClickListener {
+
+    fun onOptionsClick(option: Int)
+}
+
 @BindingAdapter("requiredAnswers")
 fun bindRequiredAnswers(textView: TextView, count: Int) {
     textView.text = String.format(
-        textView.context.getString(R.string.required_score),
-        count
+        textView.context.getString(R.string.required_score), count
     )
 }
 
 @BindingAdapter("score")
 fun bindScore(textView: TextView, score: Int) {
     textView.text = String.format(
-        textView.context.getString(R.string.score_answers),
-        score
+        textView.context.getString(R.string.score_answers), score
     )
 }
 
 @BindingAdapter("requiredPercentage")
 fun bindRequiredPercentage(textView: TextView, percentage: Int) {
     textView.text = String.format(
-        textView.context.getString(R.string.required_percentage),
-        percentage
+        textView.context.getString(R.string.required_percentage), percentage
     )
 }
 
 @BindingAdapter("scorePercentage")
 fun bindScorePercentage(textView: TextView, gameResult: GameResult) {
     textView.text = String.format(
-        textView.context.getString(R.string.score_percentage),
-        getPercentOfRightAnswers(gameResult)
+        textView.context.getString(R.string.score_percentage), getPercentOfRightAnswers(gameResult)
     )
 }
 
@@ -56,5 +61,37 @@ private fun getSmileResId(winner: Boolean): Int {
         R.drawable.ic_smile
     } else {
         R.drawable.ic_sad
+    }
+}
+
+@BindingAdapter("enoughCount")
+fun bindEnoughCount(textView: TextView, enough: Boolean) {
+    textView.setTextColor(getColorByState(textView.context, enough))
+}
+
+@BindingAdapter("enoughPercent")
+fun bindEnoughPercent(progressBar: ProgressBar, enough: Boolean) {
+    val color = getColorByState(progressBar.context, enough)
+    progressBar.progressTintList = ColorStateList.valueOf(color)
+}
+
+private fun getColorByState(context: Context, goodState: Boolean): Int {
+    val coloResId = if (goodState) {
+        android.R.color.holo_green_light
+    } else {
+        android.R.color.holo_red_dark
+    }
+    return ContextCompat.getColor(context, coloResId)
+}
+
+@BindingAdapter("numberAsText")
+fun bindNumberAsText(textView: TextView, number: Int) {
+    textView.text = number.toString()
+}
+
+@BindingAdapter("onOptionClickListener")
+fun bindOnOptionClickListener(textView: TextView, clickListener: OnOptionClickListener) {
+    textView.setOnClickListener {
+        clickListener.onOptionsClick(textView.text.toString().toInt())
     }
 }
